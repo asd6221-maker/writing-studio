@@ -1,0 +1,5 @@
+import {deflateSync} from 'node:zlib';
+import {writeFileSync} from 'node:fs';
+const crc=b=>{let c=0xffffffff;for(const v of b){c^=v;for(let k=0;k<8;k++)c=(c>>>1)^((c&1)?0xedb88320:0);}return (c^0xffffffff)>>>0;};
+const chunk=(type,data)=>{const t=Buffer.from(type),n=Buffer.alloc(4),c=Buffer.alloc(4);n.writeUInt32BE(data.length);c.writeUInt32BE(crc(Buffer.concat([t,data])));return Buffer.concat([n,t,data,c]);};
+for(const size of [180,192,512]){const raw=Buffer.alloc((size*4+1)*size);for(let y=0;y<size;y++){for(let x=0;x<size;x++){const a=x/size,b=y/size;let color=[23,61,76];if(a>.24&&a<.76&&b>.22&&b<.79&&a-b<.36)color=[245,247,249];if(a>.34&&a<.67&&((b>.49&&b<.515)||(b>.58&&b<.605)||(b>.67&&b<.695)))color=[120,150,164];const offset=y*(size*4+1)+1+x*4;raw.set([...color,255],offset);}}const header=Buffer.alloc(13);header.writeUInt32BE(size);header.writeUInt32BE(size,4);header[8]=8;header[9]=6;writeFileSync(`public/icon-${size}.png`,Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',header),chunk('IDAT',deflateSync(raw)),chunk('IEND',Buffer.alloc(0))]));}

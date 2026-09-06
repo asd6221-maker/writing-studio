@@ -1,0 +1,17 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env*
+!.env.example
+backups/
+private/
+uploads/
+*.backup.json
+*-backup*.json
+*-백업*.json
+*.zip
+*.docx
+*.hwp
+*.hwpx
+*.pdf
+work/
